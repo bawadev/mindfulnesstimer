@@ -2,19 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -31,3 +19,60 @@ body {
     text-wrap: balance;
   }
 }
+
+/* CSS for fading out the parent div */
+.fade-out {
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+/* CSS for maintaining opacity of child content */
+.fade-content {
+  opacity: 1;
+}
+
+/* Remove spinner controls in number input fields */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.rounded-font {
+  font-family: 'Roboto', sans-serif;
+  /* Add more styles to achieve rounded edges */
+}
+
+.opacity-low {
+  opacity: 0.1;
+  transition: opacity 1s;
+}
+
+.opacity-high {
+  opacity: 0.8;
+  transition: opacity 1s;
+}
+
+/* styles/globals.css */
+.chart-container {
+  margin: 2rem 0;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+h1 {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+h2 {
+  text-align: center;
+  margin: 1rem 0;
+}
+
