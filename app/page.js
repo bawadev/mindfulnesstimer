@@ -141,7 +141,7 @@ export default function Home() {
     >
       <Head>
         <title>Mindfulness Timer</title>
-        <link rel="icon" href="/favicon.ico" />
+        
       </Head>
   
       
