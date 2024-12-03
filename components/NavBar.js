@@ -1,28 +1,29 @@
-"use client"
+"use client";
 import { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartLine, faBook, faCogs, faBars } from "@fortawesome/free-solid-svg-icons";
+import { faChartLine, faBook, faCogs, faBars, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-//const hostPrefix = "/mindfulness-timer"
 const hostPrefix = "";
+
 const NavigationBar = () => {
   const path = usePathname();
   const [isWhite, setIsWhite] = useState(true);
   const popupRef = useRef(null);
-
-  
   const [showMenu, setShowMenu] = useState(false);
-  useEffect(()=>{
-    
-  if (path.startsWith('/stat') || path.startsWith('/resources') || path.startsWith('/settings')) {
-    setIsWhite(false);
-  }else{
-    setIsWhite(true);
-  }
-  },[path])
+  const [installPromptEvent, setInstallPromptEvent] = useState(null);
 
+  // Detect path for styling
+  useEffect(() => {
+    if (path.startsWith("/stat") || path.startsWith("/resources") || path.startsWith("/settings")) {
+      setIsWhite(false);
+    } else {
+      setIsWhite(true);
+    }
+  }, [path]);
+
+  // Handle click outside menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
@@ -40,6 +41,37 @@ const NavigationBar = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showMenu]);
+
+  // Capture the beforeinstallprompt event
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event) => {
+      event.preventDefault(); // Prevent automatic prompt
+      setInstallPromptEvent(event); // Save the event for triggering later
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  // Trigger the install prompt
+  const handleInstallClick = () => {
+    if (installPromptEvent) {
+      installPromptEvent.prompt(); // Show the install prompt
+      installPromptEvent.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the A2HS prompt");
+        } else {
+          console.log("User dismissed the A2HS prompt");
+        }
+        setInstallPromptEvent(null); // Clear the event after use
+      });
+    } else {
+      alert("The app cannot be installed on this browser.");
+    }
+  };
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -59,9 +91,9 @@ const NavigationBar = () => {
               <FontAwesomeIcon icon={faBars} size="2x" />
             </button>
           </div>
-          
+
           {/* Popup Menu */}
-          {showMenu ? (
+          {showMenu && (
             <div ref={popupRef} className={`absolute top-12 right-0 mt-2 ${isWhite ? "bg-black" : "bg-white"} p-4 rounded-lg shadow-lg bg-opacity-80`}>
               <ul className="text-center">
                 <li className="py-2">
@@ -84,19 +116,23 @@ const NavigationBar = () => {
                 </li>
               </ul>
             </div>
-          ) : (
-            <div className={`md:flex ${showMenu ? "block" : "hidden"} md:items-center space-x-6 mt-4 md:mt-0`}>
-              <Link href={`${hostPrefix}/stats`} className={`${!isWhite ? "text-black" : "text-white"} hover:text-gray-800`}>
-                <FontAwesomeIcon icon={faChartLine} size="2x" className={`m-5 ${!isWhite ? "text-black" : "text-white"}`} />
-              </Link>
-              <Link href={`${hostPrefix}/resources`} className={`${!isWhite ? "text-black" : "text-white"} hover:text-gray-800`}>
-                <FontAwesomeIcon icon={faBook} size="2x" className={`m-5 ${!isWhite ? "text-black" : "text-white"}`} />
-              </Link>
-              <Link href={`${hostPrefix}/settings`} className={`${!isWhite ? "text-black" : "text-white"} hover:text-gray-800`}>
-                <FontAwesomeIcon icon={faCogs} size="2x" className={`m-5 ${!isWhite ? "text-black" : "text-white"}`} />
-              </Link>
-            </div>
           )}
+
+          {/* Desktop Menu */}
+          <div className={`md:flex ${showMenu ? "block" : "hidden"} md:items-center space-x-6 mt-4 md:mt-0`}>
+            <Link href={`${hostPrefix}/stats`} className={`${!isWhite ? "text-black" : "text-white"} hover:text-gray-800`}>
+              <FontAwesomeIcon icon={faChartLine} size="2x" className={`m-5 ${!isWhite ? "text-black" : "text-white"}`} />
+            </Link>
+            <Link href={`${hostPrefix}/resources`} className={`${!isWhite ? "text-black" : "text-white"} hover:text-gray-800`}>
+              <FontAwesomeIcon icon={faBook} size="2x" className={`m-5 ${!isWhite ? "text-black" : "text-white"}`} />
+            </Link>
+            <button onClick={handleInstallClick} className={`${!isWhite ? "text-black" : "text-white"} hover:text-gray-800`}>
+              <FontAwesomeIcon icon={faDownload} size="2x" className={`m-5 ${!isWhite ? "text-black" : "text-white"}`} />
+            </button>
+            <Link href={`${hostPrefix}/settings`} className={`${!isWhite ? "text-black" : "text-white"} hover:text-gray-800`}>
+              <FontAwesomeIcon icon={faCogs} size="2x" className={`m-5 ${!isWhite ? "text-black" : "text-white"}`} />
+            </Link>
+          </div>
         </div>
       </div>
     </nav>
